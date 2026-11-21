@@ -1,0 +1,162 @@
+node {
+    def mvnHome
+
+    stage('Checkout') {
+        git branch: 'master',
+            url: 'https://github.com/Kumbhambhargavi75/HospitalManagementSystem.git'
+    }
+
+    stage('Configure Maven') {
+        mvnHome = tool name: 'Maven3', type: 'maven'
+    }
+
+    stage('Build') {
+        sh "${mvnHome}/bin/mvn clean compile"
+    }
+
+    stage('Test') {
+        sh "${mvnHome}/bin/mvn test"
+    }
+
+    stage('Package') {
+        sh "${mvnHome}/bin/mvn package"
+    }
+
+    stage('Archive') {
+        archiveArtifacts artifacts: 'target/*.war',
+                         allowEmptyArchive: true
+    }
+}
+
+
+node{
+    def mvnHome = tool 'Maven3'
+    stage('Git Checkout'){
+        git branch: 'main',
+        url:'https://github.com/deepthisagar7/library-management.git'
+    }
+    stage('Clean'){
+        sh "${mvnHome}/bin/mvn clean"
+    }
+    stage('Build'){
+        sh "${mvnHome}/bin/mvn compile"
+    }
+    stage('Test'){
+        sh "${mvnHome}/bin/mvn test"
+    }
+    stage('Package'){
+        sh "${mvnHome}/bin/mvn package"
+    }
+}
+
+
+services:
+  wordpress:
+    image: wordpress:latest
+    container_name: set1-wordpress
+    ports:
+      - "8089:80"
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: admin 
+      WORDPRESS_DB_PASSWORD: admin123 
+      WORDPRESS_DB_NAME: library
+    depends_on:
+      - db 
+    networks:
+      - set1-network 
+    restart: always
+  db:
+    image: mysql:8.0 
+    container_name: set1-mysql
+    environment: 
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: library 
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin123 
+    volumes:
+      - library-data:/var/lib/mysql
+    networks:
+      - set1-network
+    restart: always
+networks:
+  set1-network:
+    driver: bridge
+volumes:
+  library-data:
+
+
+
+services:
+  web:
+    image: nginx:latest 
+    container_name: set5-web 
+    ports: 
+      - "8085:80"
+    networks:
+      - set5-network 
+  app:
+    build: .
+    container_name: set5-tomcat 
+    ports:
+      - "8086:8080"
+    networks:
+      - set5-network
+
+networks:
+  set5-network:
+    driver: bridge
+
+
+
+# 1. Start Minikube
+minikube start --driver=docker
+
+# 2. Check status
+minikube status
+
+# 3. Check nodes
+kubectl get nodes
+
+# 4. Create Deployment
+kubectl apply -f deployment.yaml
+
+# 5. Check Deployment
+kubectl get deployments
+
+# 6. Check Pods
+kubectl get pods
+
+# 7. Create Service
+kubectl apply -f service.yaml
+
+# 8. Check Services
+kubectl get services
+
+# 9. Scale to four replicas
+kubectl scale deployment webapp-deployment --replicas=4
+
+# 10. Verify replicas
+kubectl get deployments
+
+# 11. Access application
+minikube service webapp-service
+
+# 12. Troubleshoot
+kubectl describe pod POD_NAME
+kubectl logs POD_NAME
+kubectl get events
+
+# 13. Delete one Pod
+kubectl delete pod POD_NAME
+
+# 14. Rollback
+kubectl rollout undo deployment webapp-deployment
+
+# 15. Delete Deployment
+kubectl delete deployment webapp-deployment
+
+# 16. Delete Service
+kubectl delete service webapp-service
+
+
