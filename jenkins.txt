@@ -1,0 +1,59 @@
+docker run -d --name jenkins -p 8081:8080 -p 50000:50000 jenkins/jenkins:lts
+
+docker exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword
+
+http://localhost:8081
+
+Step 7: Configure Maven
+Under Build Steps:
+
+Select Invoke top-level Maven targets.
+
+Goals:
+clean package
+
+Step 8: Archive Artifacts
+Under Post-build Actions → Archive the artifacts:
+
+Files to archive:
+target/*.war
+
+Step 9: Execute
+Click:
+
+Save → Build Now → Console Output
+
+Expected result:
+BUILD SUCCESS
+
+
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'master',
+                    url: 'https://github.com/deepthisagar7/metro-reservation.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'mvn clean compile'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+
+        stage('Package') {
+            steps {
+                sh 'mvn package'
+            }
+        }
+    }
+}
