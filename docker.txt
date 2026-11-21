@@ -1,0 +1,41 @@
+git clone https://github.com/deepthisagar7/metro-reservation.git
+cd metro-reservation
+
+FROM tomcat:9.0
+COPY target/*.war /usr/local/tomcat/webapps/metro.war
+EXPOSE 8080
+
+mvn clean package
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: metro-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: metro
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  app:
+    build: .
+    container_name: metro-app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
+volumes:
+  mysql-data:
+
+
+docker compose build
+
+docker compose up -d
+
+docker ps
+
+http://localhost:8080/metro
+
