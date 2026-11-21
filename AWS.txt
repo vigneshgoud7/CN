@@ -1,0 +1,16 @@
+sudo dnf update -y
+
+sudo dnf install java-21-amazon-corretto -y
+
+sudo dnf install maven -y
+
+git clone https://github.com/deepthisagar7/metro-reservation.git
+
+cd metro-reservation
+
+mvn clean package
+
+sudo cp target/*.war /opt/tomcat/webapps/metro.war
+
+http://YOUR_PUBLIC_IP:8080/metro
+
