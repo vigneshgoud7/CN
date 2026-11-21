@@ -1,0 +1,17 @@
+minikube start
+
+kubectl get nodes
+
+kubectl create deployment metro-deployment --image=nginx:latest
+
+kubectl get deployments
+
+kubectl get pods
+
+kubectl scale deployment metro-deployment --replicas=5
+
+kubectl get pods
+
+kubectl scale deployment metro-deployment --replicas=2
+
+kubectl delete deployment metro-deployment
